@@ -11,6 +11,7 @@ import UIKit
 let files = ["animation", "intro", "particles", "unity2d", "vr"]
 //: Next, you'll have to get a reference to your file manager. To do this, call the static method "defaultManager" on the NSFileManager object.
     // Code goes here
+let fileManager = NSFileManager.defaultManager()
 
 //: This next bit of code creates a variable to store a reference to the document directory.
 var documentDirectory: NSURL?
@@ -18,6 +19,7 @@ var documentDirectory: NSURL?
 do {
 //: Inside of the do-catch block, get a referece to the document directory by calling the URLForDirectory()
     // Code goes here
+    documentDirectory = try fileManager.URLForDirectory(.DocumentDirectory, inDomain: .UserDomainMask, appropriateForURL: nil, create: false)
 } catch {
   print(error)
 }
@@ -35,13 +37,29 @@ for file in files {
   // Code goes here
 //: Finally, copy the file url to the save location. This is copyItemAtURL().
 
+    let reference = NSBundle.mainBundle().URLForResource(file, withExtension: "txt")
+    let newUrl = documentDirectory.URLByAppendingPathComponent("\(file).txt")
+    
+    try? fileManager.copyItemAtURL(reference!, toURL: newUrl)
+
+
 }
 
 do {
 //: With your files saved, it's now time list them out. To do this, you're going to call to contentsOfDirectoryAtURL on the fileManager
     // Code goes here
+
+    let contents = try fileManager.contentsOfDirectoryAtURL(documentDirectory, includingPropertiesForKeys: nil, options: .SkipsHiddenFiles)
+    contents.count
+
+
 //: Lastly, loop through the fileList and print them out.
     // Code goes here
+    for url in contents {
+        print (url.lastPathComponent!)
+        let fileContentString = try String(contentsOfURL: url)
+        print(fileContentString)
+    }
 } catch {
   print(error)
 }
